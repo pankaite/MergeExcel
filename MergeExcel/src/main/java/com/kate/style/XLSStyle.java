@@ -38,14 +38,6 @@ public class XLSStyle {
 		generalStyle = workbook.createCellStyle();
 		generalStyle.setFillForegroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex()); // 设置前景色
 		generalStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND); // 填充前景色
-
-		// 附件样式
-		fuJianStyle = workbook.createCellStyle();
-		fuJianStyle.setAlignment(HorizontalAlignment.LEFT); // 文字向右对齐
-		fuJianStyle.setVerticalAlignment(VerticalAlignment.CENTER); // 文字垂直居中
-		fuJianStyle.setFillForegroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex()); // 设置前景色
-		fuJianStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND); // 填充前景色
-		fuJianStyle.setFont(fuJianFont); // 设置字体样式
 		
 		// 标题样式
 		titleStyle = workbook.createCellStyle();
