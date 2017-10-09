@@ -3,8 +3,6 @@ package com.kate.style;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
@@ -27,21 +25,14 @@ public class XLSStyle {
 
 		// 标题字体样式
 		titleFont = workbook.createFont();
-		titleFont.setBold(true);
-		titleFont.setFontName("仿宋_GB2132");
-		titleFont.setFontHeightInPoints((short) 15);
-
-		// 附件字体样式
-		fuJianFont = workbook.createFont();
-		fuJianFont.setBold(true);
-		fuJianFont.setColor(HSSFColorPredefined.RED.getIndex());
-		fuJianFont.setFontName("宋体");
-		fuJianFont.setFontHeightInPoints((short) 16);
+		titleFont.setBold(true); //粗体
+		titleFont.setFontName("仿宋_GB2132"); //字体样式
+		titleFont.setFontHeightInPoints((short) 15); //字体大小
 
 		// 栏目字体样式
 		columnFont = workbook.createFont();
-		columnFont.setFontName("宋体");
-		columnFont.setFontHeightInPoints((short) 12);
+		columnFont.setFontName("宋体"); //字体样式
+		columnFont.setFontHeightInPoints((short) 12); //字体大小
 
 		// 通用样式,只有前景色
 		generalStyle = workbook.createCellStyle();

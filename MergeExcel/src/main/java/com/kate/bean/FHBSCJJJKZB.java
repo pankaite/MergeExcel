@@ -118,23 +118,31 @@ public class FHBSCJJJKZB implements DaiHeBingBaoBiao {
 		
 		baoBiaoMingCheng = sheet.getRow(0).getCell(1).getStringCellValue();
 		banBenHao = sheet.getRow(1).getCell(9).getStringCellValue();
-		tuoGuanHangDaiMa = sheet.getRow(3).getCell(2).getStringCellValue();
-		tuoGuanHangMingCheng = sheet.getRow(4).getCell(2).getStringCellValue();
-		baoGaoQiShiQiJian = sheet.getRow(5).getCell(2).getStringCellValue();
-		baoGaoJieZhiQiJian = sheet.getRow(6).getCell(2).getStringCellValue();
 
 		String cellString = null; // 单元格，最终按字符串处理
 		int jiJinYeWuJianKongZiBiaoRow = 0; // 基金业务监控子表所在行
 		int jiJinTouZiZuHeRow = 0; // 基金投资组合所在行
 		int jiJinYunZuoZhuYaoZhiBiaoRow = 0; // 基金运作主要指标所在行
 		int totalRowNum = sheet.getLastRowNum();
-		for (int i = 7; i <= totalRowNum; i++) {
+		for (int i = 2; i <= totalRowNum; i++) {
 			HSSFRow row = sheet.getRow(i); // 获取行对象
 			if (row == null) { // 如果为空，不处理
 				continue;
 			}
 			cellString = row.getCell(1).getStringCellValue();
-			if (cellString.equals("基金业务监控子表")) {
+			if(cellString.equals("托管行代码：")){
+				tuoGuanHangDaiMa = row.getCell(2).getStringCellValue();
+			}
+			else if (cellString.equals("托管行名称：")) {
+				tuoGuanHangMingCheng = row.getCell(2).getStringCellValue();
+			}
+			else if (cellString.equals("报告起始期间（YYYY-MM-DD）：")) {
+				baoGaoQiShiQiJian = row.getCell(2).getStringCellValue();
+			}
+			else if (cellString.equals("报告截止期间（YYYY-MM-DD）：")) {
+				baoGaoJieZhiQiJian = row.getCell(2).getStringCellValue();
+			}
+			else if (cellString.equals("基金业务监控子表")) {
 				jiJinYeWuJianKongZiBiaoRow = i;
 			} 
 			else if (cellString.equals("报告期末基金投资组合")) {
@@ -147,7 +155,7 @@ public class FHBSCJJJKZB implements DaiHeBingBaoBiao {
 		
 		generateFirstPart(jiJinYeWuJianKongZiBiaoRow + 2, jiJinTouZiZuHeRow, sheet);
 		generateSecondPart(jiJinTouZiZuHeRow + 2, jiJinYunZuoZhuYaoZhiBiaoRow, sheet);
-		generateThirdPart(jiJinYunZuoZhuYaoZhiBiaoRow + 2, totalRowNum - 2, sheet);
+		generateThirdPart(jiJinYunZuoZhuYaoZhiBiaoRow + 2, totalRowNum - 1, sheet);
 
 	}
 
@@ -248,14 +256,13 @@ public class FHBSCJJJKZB implements DaiHeBingBaoBiao {
 	}
 
 	public void generateXLSFromBean(HSSFWorkbook workbook) {
-
 		int size1 = jiJinYeWuJianKongZiBiaos.size();
 		int size2 = jiJinTouZiZuHes.size();
 		int size3 = jiJinYunZuoZhuYaoZhiBiaos.size();
 		int maxsize = size1 + size2 + size3 + 21;
 
 		HSSFSheet sheet = workbook.createSheet();
-		for(int i = 1; i <= 9; i++){ //1-9列设置列宽
+		for(int i = 1; i < 10; i++){ //1-10列设置列宽
 			sheet.setColumnWidth(i, 8000);
 		}
 		HSSFRow row = null;
@@ -308,21 +315,17 @@ public class FHBSCJJJKZB implements DaiHeBingBaoBiao {
 		row.getCell(1).setCellStyle(XLSStyle.subTitleStyle);
 		row = sheet.getRow(9); // 基金业务监控子表的七列
 		row.getCell(1).setCellValue("基金名称");
-		row.getCell(1).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(2).setCellValue("基金代码");
-		row.getCell(2).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(3).setCellValue("行为代码");
-		row.getCell(3).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(4).setCellValue("违规异常行为");
-		row.getCell(4).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(5).setCellValue("内容");
-		row.getCell(5).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(6).setCellValue("采取措施");
-		row.getCell(6).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(7).setCellValue("管理人反馈情况");
-		row.getCell(7).setCellStyle(XLSStyle.columnStyle);
-
-		for (int i = 0; i < size1; i++) {
+		for(int i = 1; i <= 7; i++){
+			row.getCell(i).setCellStyle(XLSStyle.columnStyle);
+		}
+		
+		for (int i = 0; i < size1; i++) { // 基金业务监控子表数据填充
 			JJYWJKZB item = jiJinYeWuJianKongZiBiaos.get(i);
 			row = sheet.getRow(10 + i);
 			row.getCell(1).setCellValue(item.getJiJinMingCheng());
@@ -342,20 +345,16 @@ public class FHBSCJJJKZB implements DaiHeBingBaoBiao {
 		row.getCell(1).setCellStyle(XLSStyle.subTitleStyle);
 		row = sheet.getRow(13 + size1); // 报告期末基金投资组合的六列
 		row.getCell(1).setCellValue("基金名称");
-		row.getCell(1).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(2).setCellValue("基金代码");
-		row.getCell(2).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(3).setCellValue("类别代码");
-		row.getCell(3).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(4).setCellValue("资产类别");
-		row.getCell(4).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(5).setCellValue("金额（人民币元）");
-		row.getCell(5).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(6).setCellValue("占基金资产净值的比例（%）");
-		row.getCell(6).setCellStyle(XLSStyle.columnStyle);
-		
+		for(int i = 1; i <= 6; i++){
+			row.getCell(i).setCellStyle(XLSStyle.columnStyle);
+		}
 
-		for (int i = 0; i < size2; i++) {
+		for (int i = 0; i < size2; i++) { // 报告期末基金投资组合数据填充
 			JJTZZH item = jiJinTouZiZuHes.get(i);
 			row = sheet.getRow(size1 + 14 + i);
 			row.getCell(1).setCellValue(item.getJiJinMingCheng());
@@ -376,33 +375,28 @@ public class FHBSCJJJKZB implements DaiHeBingBaoBiao {
 		row.getCell(1).setCellStyle(XLSStyle.subTitleStyle);
 		row = sheet.getRow(17 + size1 + size2); // 报告期间基金运作主要指标的七列
 		row.getCell(1).setCellValue("基金名称");
-		row.getCell(1).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(2).setCellValue("基金代码");
-		row.getCell(2).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(3).setCellValue("交易时间（YYYY-MM-DD）");
-		row.getCell(3).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(4).setCellValue("1、前5大重仓股占基金资产净值的比例（％）");
-		row.getCell(4).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(5).setCellValue("2、前10大重仓股占基金资产净值的比例（天）");
-		row.getCell(5).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(6).setCellValue("3、现金、央票及到期日在一年以内的政府债券占基金资产净值的比例（％）");
-		row.getCell(6).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(7).setCellValue("4、正回购资金余额占基金资产净值的比例（％）");
-		row.getCell(7).setCellStyle(XLSStyle.columnStyle);
-
-		for (int i = 0; i < size3; i++) {
+		for(int i = 1; i <= 7; i++){
+			row.getCell(i).setCellStyle(XLSStyle.columnStyle);
+		}
+		
+		for (int i = 0; i < size3; i++) { // 报告期间基金运作主要指标数据填充
 			JJYZZYZB item = jiJinYunZuoZhuYaoZhiBiaos.get(i);
 			row = sheet.getRow(size1 + size2 + 18 + i);
+			for(int k = 4; k <= 7; k++){
+				row.getCell(k).setCellType(CellType.NUMERIC);		
+			}
 			row.getCell(1).setCellValue(item.getJiJinMingCheng());
 			row.getCell(2).setCellValue(item.getJiJinDaiMa());
 			row.getCell(3).setCellValue(item.getJiaoYiShiJian());
-			row.getCell(4).setCellType(CellType.NUMERIC);
 			row.getCell(4).setCellValue(item.getTop5ZhongCangGuZhanBi());
-			row.getCell(5).setCellType(CellType.NUMERIC);
 			row.getCell(5).setCellValue(item.getTop10ZhongCangGuZhanBi());
-			row.getCell(6).setCellType(CellType.NUMERIC);
 			row.getCell(6).setCellValue(item.getxJYPZFZQZhanBi());
-			row.getCell(7).setCellType(CellType.NUMERIC);
 			row.getCell(7).setCellValue(item.getZhengHuiGouZhanBi());
 			for (int j = 1; j <= 7; j++) {
 				row.getCell(j).setCellStyle(XLSStyle.tableStyle);

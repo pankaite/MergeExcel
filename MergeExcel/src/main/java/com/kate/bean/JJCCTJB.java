@@ -98,32 +98,38 @@ public class JJCCTJB implements DaiHeBingBaoBiao {
 
 		baoBiaoMingCheng = sheet.getRow(0).getCell(0).getStringCellValue();
 		banBenHao = sheet.getRow(1).getCell(20).getStringCellValue();
-		tuoGuanHangMingCheng = sheet.getRow(2).getCell(2).getStringCellValue();
-		baoGaoRiQi = sheet.getRow(3).getCell(2).getStringCellValue();
 
 		String cellString = null; // 单元格，最终按字符串处理
 		int jiJinGongSiRow = 0; // 基金公司所在行
 		int heJiRow = 0; // 合计所在行
 		int beiZhuRow = 0; // 备注所在行
 		int totalRowNum = sheet.getLastRowNum();
-		for (int i = 4; i <= totalRowNum; i++) {
+		for (int i = 2; i <= totalRowNum; i++) {
 			HSSFRow row = sheet.getRow(i); // 获取行对象
 			if (row == null) { // 如果为空，不处理
 				continue;
 			}
 			cellString = row.getCell(0).getStringCellValue();
-			if (cellString.equals("基金公司")) {
+			if(cellString.equals("托管银行：")){
+				tuoGuanHangMingCheng = row.getCell(2).getStringCellValue();
+			}
+			else if(cellString.equals("日期（YYYY-MM-DD）：")){
+				baoGaoRiQi = row.getCell(2).getStringCellValue();
+			}
+			else if (cellString.equals("基金公司")) {
 				jiJinGongSiRow = i;
-			} else if (cellString.equals("合计")) {
+			} 
+			else if (cellString.equals("合计")) {
 				heJiRow = i;
-			} else if (cellString.equals("备注")) {
+			} 
+			else if (cellString.equals("备注")) {
 				beiZhuRow = i;
 			}
 		}
 
 		generateFirstPart(jiJinGongSiRow + 1, heJiRow, sheet);
 		generateSecondPart(heJiRow, heJiRow + 1, sheet);
-		generateThirdPart(beiZhuRow + 1, totalRowNum, sheet);
+		generateThirdPart(beiZhuRow + 1, totalRowNum + 1, sheet);
 
 	}
 
@@ -214,12 +220,11 @@ public class JJCCTJB implements DaiHeBingBaoBiao {
 	}
 
 	public void generateXLSFromBean(HSSFWorkbook workbook) {
-
 		int size1 = jiJinChiCangs.size();
 		int maxsize = size1 + 16;
 
 		HSSFSheet sheet = workbook.createSheet();
-		for(int i = 0; i <= 22; i++){ //0-22列设置列宽
+		for(int i = 0; i < 23; i++){ //0-22列设置列宽
 			sheet.setColumnWidth(i, 6000);
 		}
 		HSSFRow row = null;

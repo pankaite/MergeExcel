@@ -128,12 +128,8 @@ public class LCZQJJJKRB implements DaiHeBingBaoBiao {
 
 	public void generateBeanFromXLS(HSSFSheet sheet) {
 		
-		baoBiaoMingCheng = sheet.getRow(1).getCell(1).getStringCellValue();
-		banBenHao = sheet.getRow(2).getCell(9).getStringCellValue();
-		tuoGuanHangDaiMa = sheet.getRow(3).getCell(2).getStringCellValue();
-		tuoGuanHangMingCheng = sheet.getRow(4).getCell(2).getStringCellValue();
-		baoGaoRiQi = sheet.getRow(5).getCell(2).getStringCellValue();
-		liCaiZhaiQuanJiJinLeiXing = sheet.getRow(7).getCell(2).getStringCellValue();
+		baoBiaoMingCheng = sheet.getRow(0).getCell(1).getStringCellValue();
+		banBenHao = sheet.getRow(1).getCell(9).getStringCellValue();
 		
 		String cellString = null; // 单元格，最终按字符串处理
 		int jiJinTouZiZuHeRow = 0; // 基金投资组合所在行
@@ -141,13 +137,25 @@ public class LCZQJJJKRB implements DaiHeBingBaoBiao {
 		int jiJinTouZiYHDingCunMingXiRow = 0; // 基金投资银行定期存款明细所在行
 		int jiJinTouZiXinYongZhaiMingXiRow = 0; // 基金投资信用债明细所在行
 		int totalRowNum = sheet.getLastRowNum();
-		for (int i = 8; i <= totalRowNum; i++) {
+		for (int i = 2; i <= totalRowNum; i++) {
 			HSSFRow row = sheet.getRow(i); // 获取行对象
 			if (row == null) { // 如果为空，不处理
 				continue;
 			}
 			cellString = row.getCell(1).getStringCellValue();
-			if (cellString.equals("基金投资组合")) {
+			if(cellString.equals("托管行代码：")){
+				tuoGuanHangDaiMa = row.getCell(2).getStringCellValue();
+			}
+			else if(cellString.equals("托管行名称：")){
+				tuoGuanHangMingCheng = row.getCell(2).getStringCellValue();
+			}
+			else if(cellString.equals("报告日期（YYYY-MM-DD）：")){
+				baoGaoRiQi = row.getCell(2).getStringCellValue();
+			}
+			else if(cellString.equals("理财债券基金类型")){
+				liCaiZhaiQuanJiJinLeiXing = row.getCell(2).getStringCellValue();
+			}
+			else if (cellString.equals("基金投资组合")) {
 				jiJinTouZiZuHeRow = i;
 			}
 			else if (cellString.equals("基金运作主要指标")) {
@@ -164,7 +172,7 @@ public class LCZQJJJKRB implements DaiHeBingBaoBiao {
 		generateFirstPart(jiJinTouZiZuHeRow + 2, jiJinYunZuoZhuYaoZhiBiaoRow, sheet);
 		generateSecondPart(jiJinYunZuoZhuYaoZhiBiaoRow + 2, jiJinTouZiYHDingCunMingXiRow, sheet);
 		generateThirdPart(jiJinTouZiYHDingCunMingXiRow + 2, jiJinTouZiXinYongZhaiMingXiRow, sheet);
-		generateFourthPart(jiJinTouZiXinYongZhaiMingXiRow + 2, totalRowNum, sheet);
+		generateFourthPart(jiJinTouZiXinYongZhaiMingXiRow + 2, totalRowNum + 1, sheet);
 		
 	}
 
@@ -317,7 +325,6 @@ public class LCZQJJJKRB implements DaiHeBingBaoBiao {
 	}
 
 	public void generateXLSFromBean(HSSFWorkbook workbook) {
-
 		int size1 = jiJinTouZiZuHes.size();
 		int size2 = jiJinYunZuoZhuYaoZhiBiaos.size();
 		int size3 = jiJinTouHangDingCunMingXis.size();
@@ -336,68 +343,61 @@ public class LCZQJJJKRB implements DaiHeBingBaoBiao {
 			}
 		}
 		
-		row = sheet.getRow(0); // 附件
-		row.getCell(1).setCellValue("附件1"); // 设置附件名字
-		row.getCell(1).setCellStyle(XLSStyle.fuJianStyle);
-		
-		row = sheet.getRow(1); // 理财债券基金监控日报
+		row = sheet.getRow(0); // 理财债券基金监控日报
 		row.setHeight((short) 500); // 设置行高
-		sheet.addMergedRegion(new CellRangeAddress(1, 1, 1, 8)); // 合并1-8列
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 1, 8)); // 合并1-8列
 		row.getCell(1).setCellValue(baoBiaoMingCheng); // 设置标题内容
 		row.getCell(1).setCellStyle(XLSStyle.titleStyle); // 设置标题样式
 		for (int i = 2; i <= 8; i++) {
 			row.getCell(i).setCellStyle(XLSStyle.tableStyle);
 		}
 
-		row = sheet.getRow(2); // 版本号
+		row = sheet.getRow(1); // 版本号
 		row.getCell(8).setCellValue("版本号");
 		row.getCell(9).setCellValue(banBenHao);
 		for (int i = 8; i <= 9; i++) {
 			row.getCell(i).setCellStyle(XLSStyle.columnStyle);
 		}
 
-		row = sheet.getRow(3); // 托管行代码
+		row = sheet.getRow(2); // 托管行代码
 		row.getCell(1).setCellValue("托管行代码：");
 		row.getCell(2).setCellValue(tuoGuanHangDaiMa);
 		row.getCell(1).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(2).setCellStyle(XLSStyle.tableStyle);
-		row = sheet.getRow(4); // 托管行名称
+		row = sheet.getRow(3); // 托管行名称
 		row.getCell(1).setCellValue("托管行名称：");
 		row.getCell(2).setCellValue(tuoGuanHangMingCheng);
 		row.getCell(1).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(2).setCellStyle(XLSStyle.tableStyle);
-		row = sheet.getRow(5); // 报告日期
+		row = sheet.getRow(4); // 报告日期
 		row.getCell(1).setCellValue("报告日期（YYYY-MM-DD）：");
 		row.getCell(2).setCellValue(baoGaoRiQi);
 		row.getCell(1).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(2).setCellStyle(XLSStyle.tableStyle);
 		
-		row = sheet.getRow(7); // 报告截止期间
+		row = sheet.getRow(6); // 理财债券基金类型
 		row.getCell(1).setCellValue("理财债券基金类型");
 		row.getCell(2).setCellValue(liCaiZhaiQuanJiJinLeiXing);
 		row.getCell(1).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(2).setCellStyle(XLSStyle.tableStyle);
 
-		row = sheet.getRow(10); // 基金投资组合
+		row = sheet.getRow(9); // 基金投资组合
 		row.getCell(1).setCellValue("基金投资组合");
 		row.getCell(1).setCellStyle(XLSStyle.subTitleStyle);
-		row = sheet.getRow(11); // 基金投资组合的六列
+		row = sheet.getRow(10); // 基金投资组合的六列
 		row.getCell(1).setCellValue("基金名称");
-		row.getCell(1).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(2).setCellValue("基金代码");
-		row.getCell(2).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(3).setCellValue("类别代码");
-		row.getCell(3).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(4).setCellValue("资产类别");
-		row.getCell(4).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(5).setCellValue("金额（人民币元）");
-		row.getCell(5).setCellStyle(XLSStyle.columnStyle);
 		row.getCell(6).setCellValue("占基金资产净值的比例（%）");
-		row.getCell(6).setCellStyle(XLSStyle.columnStyle);
+		for(int i = 1; i <= 6; i++){
+			row.getCell(i).setCellStyle(XLSStyle.columnStyle);
+		}
 
 		for (int i = 0; i < size1; i++) {
 			JJTZZH item = jiJinTouZiZuHes.get(i);
-			row = sheet.getRow(12 + i);
+			row = sheet.getRow(11 + i);
 			row.getCell(1).setCellValue(item.getJiJinMingCheng());
 			row.getCell(2).setCellValue(item.getJiJinDaiMa());
 			row.getCell(3).setCellValue(item.getLeiBieDaiMa());
@@ -411,10 +411,10 @@ public class LCZQJJJKRB implements DaiHeBingBaoBiao {
 			}
 		}
 		
-		row = sheet.getRow(13 + size1); // 基金运作主要指标
+		row = sheet.getRow(12 + size1); // 基金运作主要指标
 		row.getCell(1).setCellValue("基金运作主要指标");
 		row.getCell(1).setCellStyle(XLSStyle.subTitleStyle);
-		row = sheet.getRow(14 + size1); // 基金运作主要指标的十二列
+		row = sheet.getRow(13 + size1); // 基金运作主要指标的十二列
 		row.getCell(1).setCellValue("基金名称");
 		row.getCell(2).setCellValue("基金代码");
 		row.getCell(3).setCellValue("七日年化收益率（％）");
@@ -433,7 +433,7 @@ public class LCZQJJJKRB implements DaiHeBingBaoBiao {
 
 		for (int i = 0; i < size2; i++) {
 			JJYZZYZB item = jiJinYunZuoZhuYaoZhiBiaos.get(i);
-			row = sheet.getRow(15 + size1 + i);
+			row = sheet.getRow(14 + size1 + i);
 			for(int k = 3; k <= 12; k++){
 				row.getCell(k).setCellType(CellType.NUMERIC);		
 			}
@@ -454,10 +454,10 @@ public class LCZQJJJKRB implements DaiHeBingBaoBiao {
 			}
 		}
 
-		row = sheet.getRow(16 + size1 + size2); // 基金投资银行定期存款明细
+		row = sheet.getRow(15 + size1 + size2); // 基金投资银行定期存款明细
 		row.getCell(1).setCellValue("基金投资银行定期存款明细");
 		row.getCell(1).setCellStyle(XLSStyle.subTitleStyle);
-		row = sheet.getRow(17 + size1 + size2); // 基金投资银行定期存款明细的十列
+		row = sheet.getRow(16 + size1 + size2); // 基金投资银行定期存款明细的十列
 		row.getCell(1).setCellValue("基金名称");
 		row.getCell(2).setCellValue("基金代码");
 		row.getCell(3).setCellValue("存款银行名称");
@@ -474,7 +474,7 @@ public class LCZQJJJKRB implements DaiHeBingBaoBiao {
 		
 		for (int i = 0; i < size3; i++) {
 			JJTZYHDQCKMX item = jiJinTouHangDingCunMingXis.get(i);
-			row = sheet.getRow(18 + size1 + size2 + i);
+			row = sheet.getRow(17 + size1 + size2 + i);
 			for(int k = 6; k <= 10; k++){
 				row.getCell(k).setCellType(CellType.NUMERIC);		
 			}
@@ -493,10 +493,10 @@ public class LCZQJJJKRB implements DaiHeBingBaoBiao {
 			}
 		}
 
-		row = sheet.getRow(19 + size1 + size2 + size3); // 基金投资信用债明细
+		row = sheet.getRow(18 + size1 + size2 + size3); // 基金投资信用债明细
 		row.getCell(1).setCellValue("基金投资信用债明细");
 		row.getCell(1).setCellStyle(XLSStyle.subTitleStyle);
-		row = sheet.getRow(20 + size1 + size2 + size3); // 基金投资信用债明细的十二列
+		row = sheet.getRow(19 + size1 + size2 + size3); // 基金投资信用债明细的十二列
 		row.getCell(1).setCellValue("基金名称");
 		row.getCell(2).setCellValue("基金代码");
 		row.getCell(3).setCellValue("债券名称");
@@ -515,7 +515,7 @@ public class LCZQJJJKRB implements DaiHeBingBaoBiao {
 
 		for (int i = 0; i < size4; i++) {
 			JJTZXYZMX item = jiJinTouZiXinYongZhaiMingXis.get(i);
-			row = sheet.getRow(size1 + size2 + size3 + 21 + i);
+			row = sheet.getRow(20 + size1 + size2 + size3 + i);
 			for(int k = 5; k <= 6; k++){
 				row.getCell(k).setCellType(CellType.NUMERIC);		
 			}
